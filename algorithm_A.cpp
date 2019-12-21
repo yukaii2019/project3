@@ -19,4 +19,5 @@ void algorithm_A(Board board, Player player, int index[])
 
     index[0] = row;
     index[1] = col;
+    cout << SCORE(board,player) << endl;
 }
