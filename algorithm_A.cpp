@@ -213,8 +213,52 @@ int SCORE(Board board, Player player){
     sc += 2 * chain(board, player);
     return sc;
 }
-
 int minimax(int depth, bool maximizing_player, int alpha, int beta, Board board, Player R_player, Player B_player, int *x_pos, int *y_pos){
+    if (depth == 4){
+        return SCORE(board, R_player);
+    }
+    Board board_copy = board;
+    if (maximizing_player){
+        int best = -10000;
+        for (int i = 0; i < 5; i++){
+            for (int j = 0; j < 6; j++){
+                // cout << i << " "<<j <<endl;
+                // cout << (int)board.place_orb(i,j,&R_player)<<endl;
+                if (board.place_orb(i, j, &R_player)){
+                    int val = minimax(depth + 1, false, alpha, beta, board, R_player, B_player, x_pos, y_pos);
+                    if (best < val && depth == 0){
+                        *x_pos = i;
+                        *y_pos = j;
+                    }
+                    best = max(best, val);
+                    alpha = max(alpha, best);
+                    board = board_copy;
+                    if (beta <= alpha)
+                        break;
+                }
+            }
+        }
+        return best;
+    }
+    else{
+        int best = 10000;
+        for (int i = 0; i < 5; i++){
+            for (int j = 0; j < 6; j++){
+                //Board board_copy = board;
+                if (board.place_orb(i, j, &B_player)){
+                    int val = minimax(depth + 1, true, alpha, beta, board, R_player, B_player, x_pos, y_pos);
+                    best = min(best, val);
+                    beta = min(beta, best);
+                    board = board_copy;
+                    if (beta <= alpha)
+                        break;
+                }
+            }
+        }
+        return best;
+    }
+}
+int minimax2(int depth, bool maximizing_player, int alpha, int beta, Board board, Player R_player, Player B_player, int *x_pos, int *y_pos){
     if (depth == 3){
         return SCORE(board, R_player);
     }
@@ -260,6 +304,245 @@ int minimax(int depth, bool maximizing_player, int alpha, int beta, Board board,
     }
 }
 
+int get_tmp_val_0(Board board,bool color){
+    Board board_copy = board;
+    int max_val = -10000;
+    int tmp_val = -10000; 
+    if(color == 1){
+        Player player('r');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    tmp_val = SCORE(board,player);
+                    board = board_copy;
+                }
+                max_val = max(max_val,tmp_val);
+            }
+        }
+    }
+    else{
+        Player player('b');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    tmp_val = SCORE(board,player);
+                    board = board_copy;
+                }
+                max_val = max(max_val,tmp_val);
+            }
+        }
+    }
+    return max_val;
+}
+int get_tmp_val_1(Board board,bool color){
+    Board board_copy = board;
+    int min_val = 10000;
+    int tmp_val = 10000;
+    if(color == 1){
+        Player player('r');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_0(board,1);
+                    else
+                        tmp_val = get_tmp_val_0(board,0);
+                    board = board_copy;
+                }
+                min_val = min(min_val,tmp_val);
+            }
+        }
+    }
+    else{
+        Player player('b');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_0(board,1);
+                    else
+                        tmp_val = get_tmp_val_0(board,0);
+                    board = board_copy;
+                }
+                min_val = min(min_val,tmp_val);
+            }
+        }
+    }
+    return min_val;
+}
+
+int get_tmp_val_2(Board board,bool color){
+    Board board_copy = board;
+    int max_val = -10000;
+    int tmp_val = -10000;
+    if(color == 1){
+        Player player('r');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_1(board,1);
+                    else
+                        tmp_val = get_tmp_val_1(board,0);
+                    board = board_copy;
+                }
+                max_val = max(max_val,tmp_val);
+            }
+        }
+    }
+    else{
+        Player player('b');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_1(board,1);
+                    else
+                        tmp_val = get_tmp_val_1(board,0);
+                    board = board_copy;
+                }
+                max_val = max(max_val,tmp_val);
+            }
+        }
+    }
+    return max_val;
+}
+int get_tmp_val_3(Board board,bool color){
+    Board board_copy = board;
+    int min_val = 10000;
+    int tmp_val = 10000;
+    if(color == 1){
+        Player player('r');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_2(board,1);
+                    else
+                        tmp_val = get_tmp_val_2(board,0);
+                    board = board_copy;
+                }
+                min_val = min(min_val,tmp_val);
+            }
+        }
+    }
+    else{
+        Player player('b');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_2(board,1);
+                    else
+                        tmp_val = get_tmp_val_2(board,0);
+                    board = board_copy;
+                }
+                min_val = min(min_val,tmp_val);
+            }
+        }
+    }
+    return min_val;
+}
+
+int get_tmp_val_4(Board board,bool color,int& _x,int& _y){
+    Board board_copy = board;
+    int max_val = -10000;
+    int tmp_val = -10000; 
+    if(color == 1){
+        Player player('r');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_3(board,1);
+                    else
+                        tmp_val = get_tmp_val_3(board,0);
+                    board = board_copy;
+                }
+                if(max_val < tmp_val){
+                    _x = i;
+                    _y = j;
+                }
+                max_val = max(max_val,tmp_val);
+            }
+        }
+    }
+    else{
+        Player player('b');
+        for(int i=0;i<5;i++){
+            for(int j=0;j<6;j++){
+                board_copy = board;
+                if(board.place_orb(i,j,&player)){
+                    if(color == 0)
+                        tmp_val = get_tmp_val_3(board,1);
+                    else
+                        tmp_val = get_tmp_val_3(board,0);
+                    board = board_copy;
+                }
+                if(max_val < tmp_val){
+                    _x = i;
+                    _y = j;
+                }
+                max_val = max(max_val,tmp_val);
+            }
+        }
+    }
+    return max_val;
+}
+
+
+
+
+
+
+int iterative_minimax(bool color,Board board){
+
+    // int best[3];
+    // if(color == 0){
+    //     for(int i_1=0;i_1<5;i_1++){
+    //         for(int j_1=0;j_1<6;j_1++){
+    //             best[0] = -10000;
+    //             Player Player1('r');        
+    //             Board board1_copy = board;
+    //             if(board.place_orb(i_1,j_1,&player1)){
+
+    //             }
+
+    //             for(int i_2=0;i_2<5;i_2++){
+    //                 for(int j_2=0;j_2<6;j++){
+    //                     Board board2;            
+    //                     int max_val=-10000;
+    //                     int tmp_max_val;
+                        
+
+    //                     // for(int i_2=0;i_3<5;i_3++){
+    //                     //     for(int j_3=0;j_3<6;j_3++){
+    //                     //         Player Player3('r');        
+    //                     //         Board board1_copy = board;
+    //                     //         if(board.place_orb(i_3,j_3,&player3)){
+    //                     //             tmp_max_val = SCORE(board2,Player3);
+    //                     //         }
+    //                     //         max_val = max(max_val,tmp_max_val);
+    //                     //     }
+    //                     // }
+
+    //                 }
+    //             }
+
+    //         }
+    //     }
+    // }
+}
+
 
 void algorithm_A(Board board, Player player, int index[]){
     int row, col;
@@ -270,6 +553,11 @@ void algorithm_A(Board board, Player player, int index[]){
         minimax(0, true, -10000, 10000, board, p1, p2, &row, &col);
     else if (player.get_color() == 'b')
         minimax(0, true, -10000, 10000, board, p2, p1, &row, &col);
+
+    // if(color == 'r')
+    //     get_tmp_val_4(board,1,row,col);
+    // else 
+    //     get_tmp_val_4(board,0,row,col);
 
     index[0] = row;
     index[1] = col;
