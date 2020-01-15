@@ -220,8 +220,10 @@ int minimax(int depth, bool maximizing_player, int alpha, int beta, Board board,
     Board board_copy = board;
     if (maximizing_player){
         int best = -10000;
+        bool flag = false;
         for (int i = 0; i < 5; i++){
             for (int j = 0; j < 6; j++){
+
                 // cout << i << " "<<j <<endl;
                 // cout << (int)board.place_orb(i,j,&R_player)<<endl;
                 if (board.place_orb(i, j, &R_player)){
@@ -233,15 +235,20 @@ int minimax(int depth, bool maximizing_player, int alpha, int beta, Board board,
                     best = max(best, val);
                     alpha = max(alpha, best);
                     board = board_copy;
-                    if (beta <= alpha)
+                    if (beta <= alpha){
+                        flag = true;
                         break;
+                    }
                 }
             }
+            if(flag == true)
+                break;
         }
         return best;
     }
     else{
         int best = 10000;
+        bool flag = false;
         for (int i = 0; i < 5; i++){
             for (int j = 0; j < 6; j++){
                 //Board board_copy = board;
@@ -250,10 +257,14 @@ int minimax(int depth, bool maximizing_player, int alpha, int beta, Board board,
                     best = min(best, val);
                     beta = min(beta, best);
                     board = board_copy;
-                    if (beta <= alpha)
+                    if (beta <= alpha){
+                        flag == true;
                         break;
+                    }
                 }
             }
+            if(flag == true)
+                break;
         }
         return best;
     }
